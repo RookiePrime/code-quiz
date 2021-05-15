@@ -58,6 +58,9 @@ const sectionEl = document.querySelector("#quiz-box");
 // The timer element
 const  timerEl = document.querySelector("#timer");
 
+// The high score element
+const highScoresEl = document.querySelector("#high-scores");
+
 // When the page first loads and when the score is submitted, the start page is loaded
 const startPage = () => {
     // Create the elements to put on the page
@@ -184,7 +187,7 @@ const startQuiz = () => {
 // Shows the high scores
 const showHighScores = () => {
     const startBox = document.querySelector("#start-box");
-    startBox.remove();
+    if (startBox) startBox.remove();
 
     // Create all the elements to put to the page
     const scoreBoxEl = document.createElement("div");
@@ -231,6 +234,23 @@ const saveScores = () => {
     localStorage.setItem("scores", JSON.stringify(scores));
 };
 
+// Sorts the scores from highest to lowest
+const sortScores = () => {
+    scores.sort(function compare(a, b) {
+        const score1 = a.score;
+        const score2 = b.score
+        if (score1 > score2) return -1;
+        if (score1 < score2) return 1;
+        return 0;
+    });
+};
+
+// If you wanna go back to the quiz, delete the score page and draw the start page again
+const backToQuiz = () => {
+    document.querySelector("#score-box").remove();
+    startPage();
+};
+
 // When you click the quiz box and it's a correct answer, you get a point. If it's just an answer and not correct, no point. Either way, time to move onto the next question.
 document.querySelector("#quiz-box").addEventListener("click", function(event) {
     const clickedEl = event.target;
@@ -244,7 +264,14 @@ document.querySelector("#quiz-box").addEventListener("click", function(event) {
 
         askQuestion();
     } else if (clickedEl.id === "high-scores") {
-        showHighScores();
+
+        if (highScoresEl.textContent === "see high scores") {
+            highScoresEl.textContent = "back to quiz";
+            showHighScores();
+        } else {
+            highScoresEl.textContent = "see high scores";
+            backToQuiz();
+        }
     }
 });
 
@@ -262,7 +289,7 @@ document.querySelector("#quiz-box").addEventListener("submit", function(event) {
         }
 
         scores.push(newScore);
-        console.log(scores);
+        sortScores();
         saveScores();
         document.querySelector("#ending-box").remove();
         startPage();

@@ -43,14 +43,114 @@ const questions = [
             "numberOfDays >= 7 { baconEaten++ } : hunger++;"
         ],
         correctAnswer: 0
+    },
+    {
+        question: "Which of these is not a term in the JavaScript programming language?",
+        answers: [
+            "Switch", "For", "Do", "When"
+        ],
+        correctAnswer: 3
+    },
+    {
+        question: "Which symbol is used for a modulus operation in JavaScript?",
+        answers: [
+            "^", "%", "A single &", "?"
+        ],
+        correctAnswer: 1
+    },
+    {
+        question: "Which of these is not correct syntax for an arrow function?",
+        answers: [
+            "function thingy(c) { return something };",
+            "const thingy = x => { return something };",
+            "const thingy = z => something;",
+            "let thingy = (a, b) => { return something };"
+        ],
+        correctAnswer: 0
+    },
+    {
+        question: "How many times can an 'if' statement be extended with 'else if' statements?",
+        answers: [
+            "Only once", "255 times", "Infinitely", "8 times"
+        ],
+        correctAnswer: 2
+    },
+    {
+        question: "What happens when a program runs a loop with an end condition it can never achieve?",
+        answers: [
+            "It loops 255 times, escapes and returns an error",
+            "It loops until the browser stops it; how long that takes depends on the browser",
+            "It doesn't loop",
+            "It loops indefinitely"
+        ],
+        correctAnswer: 3
+    },
+    {
+        question: "Which of the following is not a valid declaration?",
+        answers: [
+            "let x = 0",
+            "perm z = []",
+            "const y = {}",
+            "var a = 'fire'"
+        ],
+        correctAnswer: 1
+    },
+    {
+        question: "Which of these HTML element enables the import of third-party JavaScript APIs?",
+        answers: [
+            "<script>", "<link>", "<blink>", "<iframe>"
+        ],
+        correctAnswer: 0
+    },
+    {
+        question: "What does the 'switch' statement do?",
+        answers: [
+            "It inverts a boolean value, switching it from false to true or true to false",
+            "It revises the condition of a loop so that it can end later or sooner, as needed",
+            "It evaluates a condition and provides executes different outcomes based on said evaluation",
+            "It enables an API exclusively for use in applications made for the Nintendo Switch"
+        ],
+        correctAnswer: 2
+    },
+    {
+        question: "What method is used to program a callback function to the click of a button on a webpage?",
+        answers: [
+            ".addClass()", ".setAttribute()", ".event()", ".addEventListener()"
+        ],
+        correctAnswer: 3
+    },
+    {
+        question: "What is an argument in JavaScript?",
+        answers: [
+            "A value provided to an If, While, or Switch statement that is evaluated to determine what part of the code runs next",
+            "One or more variables included in a method call, to act as parameters for that method",
+            "A kind of error that results from the code being unable to determine which variable to use for an operation",
+            "A fundamental feature of JavaScript that contains the data for a user's input in an application"
+        ],
+        correctAnswer: 1
+    },
+    {
+        question: "Which of these expressions evaluates to 'false'?",
+        answers: [
+            "!'0'", "!null", "!undefined", "!0"
+        ],
+        correctAnswer: 0
     }
 ];
+// Start application with a duplicate array of the questions, so that questions can be removed from it over time until none remain
+const questionsToAsk = [];
+
+const fillQuestionsToAsk = () => {
+    for (let i = 0; i < questions.length; i++) {
+        questionsToAsk.push(questions[i]);
+    }
+};
 
 let scores = [];
 let score = 0;
-let time;
+let time = 60;
 // Difficulty options
-let timeDifficulty = [40, 30, 20, 10]
+let timeBase = 60;
 
 // The place to put questions on the page
 const sectionEl = document.querySelector("#quiz-box");
@@ -89,11 +189,19 @@ const askQuestion = () => {
         document.querySelector("#question-box").remove();
     }
 
+    // Check if the array is empty. If it is, the quiz is over!
+    if (questionsToAsk.length === 0) {
+        time = -1;
+        return;
+    }
 
-    // First, pick a question from the questions array
-    const randomQ = Math.floor(Math.random() * questions.length);
-    const question = questions[randomQ];
-    
+    // Pick a question from the questions array
+    const randomQ = Math.floor(Math.random() * questionsToAsk.length);
+    const question = questionsToAsk[randomQ];
+
+    // Delete the question from the array so it's not asked again
+    questionsToAsk.splice(randomQ, 1);
+
     // Then, create the elements necessary for the question to appear on the page, and put the question and its answers in the elements
     const questionBoxEl = document.createElement("div");
     questionBoxEl.id = "question-box";
@@ -163,11 +271,11 @@ const startQuiz = () => {
     // First, remove the starting text and button, to clear the space and prevent people from starting a quiz in the middle of a quiz.
     const startBox = document.querySelector("#start-box");
     startBox.remove();
-    
+
     // Then, start the timer, and when it reaches 0, end the quiz
     timerEl.setAttribute("style", "display: block");
     timerEl.textContent = time;
-    time = timeDifficulty[3];
+    time = timeBase;
 
     const timer = setInterval(function() {
         timerEl.textContent = time;
@@ -179,6 +287,9 @@ const startQuiz = () => {
         }
         
     }, 1000);
+
+    // Put all the questions in the array before we start
+    fillQuestionsToAsk();
 
     // Then, ask a question
     askQuestion();
@@ -258,8 +369,9 @@ document.querySelector("#quiz-box").addEventListener("click", function(event) {
     if (clickedEl.id === "start-btn") {
         startQuiz();
     } else if (clickedEl.className === "answer") {
+        // Your score goes up if you're right, and moreso if you're in the next level -- and as the levels go up, so do the penalties for wrong answers. Gotta be fast, gotta be right!
         if (clickedEl.id === "correct") {
-            score++;
+            score = score++;
         }
 
         askQuestion();

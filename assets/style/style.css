@@ -22,6 +22,22 @@ body {
    min-height: 100vh;
 }
 
+.button-style {
+    border: none;
+    font-size: 30px;
+    padding: 5px 20px;
+    background-color: var(--sec-bg-color);
+    color: var(--sec-text-color);
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.button-style:hover,
+.button-style:focus {
+    background-color: var(--sec-bg-color-hl);
+}
+
+
 /* The header styling */
 
 header {
@@ -49,17 +65,16 @@ main section {
     box-shadow: 0 0 20px black;
     margin: 50px;
     padding: 40px;
-    height: 80vh;
+    height: 70vh;
 }
 
 #start-box {
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
 }
 
-section h2 {
+main h2 {
     margin: 0;
     font-weight: normal;
     text-align: center;
@@ -70,9 +85,18 @@ section h2 {
 #timer {
     display: none;
     position: absolute;
-    top: 18%;
+    top: 70px;
     left: 50%;
     text-align: center;
+}
+
+#quiz-box {
+    display: flex;
+    justify-content: center;
+}
+
+section .ready-h2 {
+    margin: 30px 0;
 }
 
 /* Stuff pertaining to the high score display begins here */
@@ -91,13 +115,6 @@ section h2 {
     transition: all 0.3s ease;
 }
 
-#high-scores.back-to-quiz {
-    display: none;
-}
-
-.back-to-quiz-visible {
-    display: block;
-}
 
 #high-scores:hover,
 #high-scores:focus {
@@ -110,6 +127,16 @@ section h2 {
     display: flex;
     flex-direction: column;
     align-items: center;
+    width: 50%;
+}
+
+#score-box h2 {
+    text-align: center;
+}
+
+#score-box button {
+    font-size: 16px;
+    padding: 5px 10px;
 }
 
 ol {
@@ -118,47 +145,92 @@ ol {
     align-items: flex-start;
     list-style: none;
     width: 50%;
+    margin: 5px 60px 0 0;
 }
 
 ol li {
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
+    align-items: center;
     width: 100%;
-    background-color: gray;
+    padding: 0 10px;
+    background-color: var(--sec-bg-color);
+    color: var(--sec-text-color);
 }
 
 ol li:nth-child(2n) {
     background-color: var(--sec-text-color);
-}
-
-ol p {
-    width: 100%;
-    padding: 10px;
-}
-
-ol span {
-    margin-left: 50%;
+    color: var(--main-text-color);
 }
 
 /* Stuff pertaining to the high score display ends here */
 
-section .ready-h2 {
-    margin: 30px 0;
+/* The Question style begins here */
+
+#question-box {
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 400px;
 }
 
-#start-btn,
-input[type=submit] {
-    border: none;
-    font-size: 40px;
-    padding: 5px 20px;
+#question-box li {
+    list-style: none;
+    padding: 10px;
+    margin: 10px 0;
     background-color: var(--sec-bg-color);
-    color: var(--sec-text-color);
-    transition: all 0.3s ease;
+    color: var(--sec-text-color)
 }
 
-#start-btn:hover,
-#start-btn:focus,
-input[type=submit]:hover,
-input[type=submit]:focus {
+#question-box li:hover {
     background-color: var(--sec-bg-color-hl);
+    color: var(--sec-text-color-hl);
 }
+
+#correctness {
+    font-size: 48px;
+    position: absolute;
+    top: 50px;
+    left: 50px;
+    text-align: center;
+    opacity: 0;
+}
+
+
+/* The Question style ends here */
+
+/* Submit Score style starts here */
+
+#ending-box {
+    display: flex;
+    flex-direction: column;
+    width: 50%;
+}
+
+#ending-box input[type="text"] {
+    width: 50px;
+    margin: 10px
+}
+
+#ending-box input[type="submit"] {
+    font-size: 16px;
+    margin: 10px;
+}
+
+/* Submit Score style ends here */
+
+/* Media queries begin here */
+
+@media screen and (max-width: 860px) {
+    #ending-box {
+        width: 100%;
+    }
+
+    #ending-box p {
+        font-size: 12px;
+        text-align: center;
+    }
+}
+
+/* Media queries end here */

@@ -175,12 +175,16 @@ const startPage = () => {
     startReadyEl.className = "ready-h2";
     startBtnEl.textContent = "Start";
     startBtnEl.id = "start-btn";
+    startBtnEl.className = "button-style";
     // Add them to the page
     startBoxEl.appendChild(startRulesEl);
     startBoxEl.appendChild(startReadyEl);
     startBoxEl.appendChild(startBtnEl);
 
     sectionEl.appendChild(startBoxEl);
+
+    // Make the high score button appear, in case it wasn't already there
+    document.querySelector("#high-scores").setAttribute("style", "display: block");
 };
 
 const askQuestion = () => {
@@ -227,6 +231,7 @@ const askQuestion = () => {
     questionBoxEl.appendChild(answersUlEl);
     // Then apply the elements to the page
     sectionEl.appendChild(questionBoxEl);
+    
 };
 
 const endQuiz = () => {
@@ -241,27 +246,29 @@ const endQuiz = () => {
     const endPEl = document.createElement("p");
     const endFormEl = document.createElement("form");
     const endInitPEl = document.createElement("p");
-    const endInitialsEl = document.createElement("input");
+    const endInputEl = document.createElement("input");
     const endBtnEl = document.createElement("input");
 
     endEl.id = "ending-box"
     endH2El.textContent = "The quiz is over! Let's see how you did!";
     endPEl.textContent = "Your score is " + score + ".";
     endInitPEl.textContent = "Type in your initials:";
-    endInitialsEl.setAttribute("name", "initials");
-    endInitialsEl.setAttribute("type", "text");
+    endInputEl.setAttribute("name", "initials");
+    endInputEl.setAttribute("type", "text");
     endBtnEl.setAttribute("type", "submit");
     endBtnEl.setAttribute("minlength", "1");
     endBtnEl.setAttribute("maxlength", "5");
     endBtnEl.textContent = "Submit";
+    endBtnEl.className = "button-style";
 
     // Put the elements on the screen
     endEl.appendChild(endH2El);
     endEl.appendChild(endPEl);
 
+    endInitPEl.appendChild(endInputEl);
+    endInitPEl.appendChild(endBtnEl);
     endFormEl.appendChild(endInitPEl);
-    endFormEl.appendChild(endInitialsEl);
-    endFormEl.appendChild(endBtnEl);
+    // endFormEl.appendChild(endBtnEl);
     endEl.appendChild(endFormEl);
 
     sectionEl.appendChild(endEl);
@@ -271,6 +278,9 @@ const startQuiz = () => {
     // First, remove the starting text and button, to clear the space and prevent people from starting a quiz in the middle of a quiz.
     const startBox = document.querySelector("#start-box");
     startBox.remove();
+
+    // hide the high score button, so people don't look at the scores instead of taking the quiz
+    document.querySelector("#high-scores").setAttribute("style", "display: none");
 
     // Then, start the timer, and when it reaches 0, end the quiz
     timerEl.setAttribute("style", "display: block");
@@ -303,29 +313,46 @@ const showHighScores = () => {
     // Create all the elements to put to the page
     const scoreBoxEl = document.createElement("div");
     const scoreH2El = document.createElement("h2");
+    const eraseBtnEl = document.createElement("button");
     const scoreListEl = document.createElement("ol");
 
-    for (let i = 0; i < scores.length; i++) {
-        // Within this loop, we do the whole create, attribute, append thing per score
-        const scoreItemEl = document.createElement("li");
-        const scoreEl = document.createElement("p")
-        const scoreInitEl = document.createElement("span");
+    if (scores.length) {
+        for (let i = 0; i < scores.length; i++) {
+            // Within this loop, we do the whole create, attribute, append thing per score
+            const scoreItemEl = document.createElement("li");
+            const scoreEl = document.createElement("p")
+            const scoreInitEl = document.createElement("span");
+    
+            scoreEl.textContent = scores[i].score;
+            eraseBtnEl.textContent = "Clear Scores";
+            eraseBtnEl.id = "clear-scores";
+            eraseBtnEl.className = "button-style";
+            scoreInitEl.textContent = scores[i].initials;
+    
+            scoreItemEl.appendChild(scoreInitEl);
+            scoreItemEl.appendChild(scoreEl);
+            scoreListEl.appendChild(scoreItemEl);
+        }
+        // Then give them attributes and content
+        scoreBoxEl.id = "score-box";
+        scoreH2El.textContent = "High Scores"
+    
+        // Then append them to the page
+        scoreBoxEl.appendChild(scoreH2El);
+        scoreBoxEl.appendChild(eraseBtnEl);
+        scoreBoxEl.appendChild(scoreListEl);
+    } else {
+        const noScoresEl = document.createElement("p");
+        noScoresEl.className = "button-style";
+        noScoresEl.textContent = "There are no scores!";
 
-        scoreEl.textContent = scores[i].score;
-        scoreInitEl.textContent = scores[i].initials;
+        scoreBoxEl.id = "score-box";
+        scoreH2El.textContent = "High Scores"
 
-        scoreEl.appendChild(scoreInitEl);
-        scoreItemEl.appendChild(scoreEl);
-        scoreListEl.appendChild(scoreItemEl);
+        scoreBoxEl.appendChild(scoreH2El);
+        scoreBoxEl.appendChild(noScoresEl);
     }
-
-    // Then give them attributes and content
-    scoreBoxEl.id = "score-box";
-    scoreH2El.textContent = "High Scores"
-
-    // Then append them to the page
-    scoreBoxEl.appendChild(scoreH2El);
-    scoreBoxEl.appendChild(scoreListEl);
+    
     sectionEl.appendChild(scoreBoxEl);
 };
 
@@ -362,6 +389,35 @@ const backToQuiz = () => {
     startPage();
 };
 
+// Makes "Correct!" or "Incorrect!" appear when the user picks an answer
+const showRightness = correctness => {
+    // Delete the old one if it's still there
+    if (document.querySelector("#correctness")) {
+        document.querySelector("#correctness").remove();
+    }
+
+    const textEl = document.createElement("h2");
+    textEl.id = "correctness";
+
+    if (correctness) {
+        textEl.textContent = "Correct!";
+    } else {
+        textEl.textContent = "Incorrect!";
+    }
+
+    sectionEl.appendChild(textEl);
+    textEl.animate([
+        { opacity: "0" },
+        { opacity: "1" },
+        { opacity: "0" }
+    ], {
+        duration: 2000
+    });
+    setTimeout(function() {
+        textEl.remove();
+    }, 2000);
+}
+
 // When you click the quiz box and it's a correct answer, you get a point. If it's just an answer and not correct, no point. Either way, time to move onto the next question.
 document.querySelector("#quiz-box").addEventListener("click", function(event) {
     const clickedEl = event.target;
@@ -371,7 +427,10 @@ document.querySelector("#quiz-box").addEventListener("click", function(event) {
     } else if (clickedEl.className === "answer") {
         // Your score goes up if you're right, and moreso if you're in the next level -- and as the levels go up, so do the penalties for wrong answers. Gotta be fast, gotta be right!
         if (clickedEl.id === "correct") {
-            score = score++;
+            score++;
+            showRightness(true);
+        } else {
+            showRightness(false);
         }
 
         askQuestion();
@@ -384,6 +443,11 @@ document.querySelector("#quiz-box").addEventListener("click", function(event) {
             highScoresEl.textContent = "see high scores";
             backToQuiz();
         }
+    } else if (clickedEl.id === "clear-scores") {
+        scores = [];
+        localStorage.removeItem("scores");
+        document.querySelector("#score-box").remove();
+        showHighScores();
     }
 });
 
